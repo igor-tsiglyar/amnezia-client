@@ -193,7 +193,11 @@ QString InterfaceConfig::toWgConf(const QMap<QString, QString>& extra) const {
 
   out << "\n[Peer]\n";
   out << "PublicKey = " << m_serverPublicKey << "\n";
-  out << "Endpoint = " << m_serverIpv4AddrIn.toUtf8() << ":" << m_serverPort
+  // The address may be an IPv6 literal resolved from the server host name
+  const QString endpointHost = m_serverIpv4AddrIn.contains(':')
+                                   ? QString("[%1]").arg(m_serverIpv4AddrIn)
+                                   : m_serverIpv4AddrIn;
+  out << "Endpoint = " << endpointHost.toUtf8() << ":" << m_serverPort
       << "\n";
 
   /* In theory, we should use the ipv6 endpoint, but wireguard doesn't seem

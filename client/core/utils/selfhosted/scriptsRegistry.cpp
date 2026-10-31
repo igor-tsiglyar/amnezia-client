@@ -146,6 +146,8 @@ amnezia::ScriptVars amnezia::genBaseVars(const ServerCredentials &credentials,
             : credentials.hostName;
     if (!serverIp.isEmpty()) {
         vars.append({ { "$SERVER_IP_ADDRESS", serverIp } });
+        // Host part of a "host:port" endpoint: IPv6 literals need square brackets
+        vars.append({ { "$SERVER_ENDPOINT_HOST", serverIp.contains(':') ? QString("[%1]").arg(serverIp) : serverIp } });
     } else {
         qWarning() << "amnezia::genBaseVars unable to resolve address for credentials.hostName";
     }

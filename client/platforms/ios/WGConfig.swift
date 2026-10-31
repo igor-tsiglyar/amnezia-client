@@ -152,7 +152,7 @@ struct WGConfig: Decodable {
     PublicKey = \(serverPublicKey)
     \(presharedKey == nil ? "" : "PresharedKey = \(presharedKey!)")
     AllowedIPs = \(allowedIPs.joined(separator: ", "))
-    Endpoint = \(hostName):\(port)
+    Endpoint = \(hostName.contains(":") ? "[\(hostName)]" : hostName):\(port)
     \(persistentKeepAlive == nil ? "" : "PersistentKeepalive = \(persistentKeepAlive!)")
     """
   }

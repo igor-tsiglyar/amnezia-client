@@ -602,11 +602,24 @@ void InstallUiController::clearProcessedServerCredentials()
 
 void InstallUiController::setProcessedServerCredentials(const QString &hostName, const QString &userName, const QString &secretData)
 {
-    m_processedServerCredentials.hostName = hostName;
-    if (m_processedServerCredentials.hostName.contains(":")) {
-        m_processedServerCredentials.port = m_processedServerCredentials.hostName.split(":").at(1).toInt();
-        m_processedServerCredentials.hostName = m_processedServerCredentials.hostName.split(":").at(0);
+    // Accepted forms: host, host:port, IPv4, IPv4:port, IPv6, [IPv6], [IPv6]:port
+    QString host = hostName.trimmed();
+    if (host.startsWith('[')) {
+        const int close = host.indexOf(']');
+        if (close > 0) {
+            const QString rest = host.mid(close + 1);
+            if (rest.startsWith(':')) {
+                m_processedServerCredentials.port = rest.mid(1).toInt();
+            }
+            host = host.mid(1, close - 1);
+        }
+    } else if (host.count(':') == 1) {
+        const int colon = host.indexOf(':');
+        m_processedServerCredentials.port = host.mid(colon + 1).toInt();
+        host = host.left(colon);
     }
+    // Two or more colons without brackets is a bare IPv6 address: keep the default port.
+    m_processedServerCredentials.hostName = host;
     m_processedServerCredentials.userName = userName;
     m_processedServerCredentials.secretData = secretData;
 }

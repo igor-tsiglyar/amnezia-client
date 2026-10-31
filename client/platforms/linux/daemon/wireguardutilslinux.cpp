@@ -249,7 +249,12 @@ bool WireguardUtilsLinux::updatePeer(const InterfaceConfig& config) {
         out << "preshared_key=" << QString(pskKey.toHex()) << "\n";
     }
     if (!config.m_serverIpv4AddrIn.isNull()) {
-        out << "endpoint=" << config.m_serverIpv4AddrIn << ":";
+        // The address may be an IPv6 literal resolved from the server host name
+        if (config.m_serverIpv4AddrIn.contains(':')) {
+            out << "endpoint=[" << config.m_serverIpv4AddrIn << "]:";
+        } else {
+            out << "endpoint=" << config.m_serverIpv4AddrIn << ":";
+        }
     } else if (!config.m_serverIpv6AddrIn.isNull()) {
         out << "endpoint=[" << config.m_serverIpv6AddrIn << "]:";
     } else {
